@@ -61,13 +61,13 @@ namespace Detail {
     struct KeyTester_ ## Key                                                                        \
     {                                                                                               \
         template <typename T>                                                                       \
-        static int Get(typename std::enable_if<has_nested_ ## Key<ImGuiKey_>::value, T>::type*)     \
+        static int Get(typename std::enable_if<has_nested_ ## Key<ImGuiKey>::value, T>::type*)     \
         {                                                                                           \
             return ImGui::GetKeyIndex(T::Key);                                                      \
         }                                                                                           \
                                                                                                     \
         template <typename T>                                                                       \
-        static int Get(typename std::enable_if<!has_nested_ ## Key<ImGuiKey_>::value, T>::type*)    \
+        static int Get(typename std::enable_if<!has_nested_ ## Key<ImGuiKey>::value, T>::type*)    \
         {                                                                                           \
             return -1;                                                                              \
         }                                                                                           \
@@ -78,12 +78,12 @@ DECLARE_KEY_TESTER(ImGuiKey_D);
 
 static inline int GetKeyIndexForF()
 {
-    return KeyTester_ImGuiKey_F::Get<ImGuiKey_>(nullptr);
+    return KeyTester_ImGuiKey_F::Get<ImGuiKey>(nullptr);
 }
 
 static inline int GetKeyIndexForD()
 {
-    return KeyTester_ImGuiKey_D::Get<ImGuiKey_>(nullptr);
+    return KeyTester_ImGuiKey_D::Get<ImGuiKey>(nullptr);
 }
 
 } // namespace Detail
@@ -204,10 +204,14 @@ static void ImDrawListSplitter_Grow(ImDrawList* draw_list, ImDrawListSplitter* s
         }
         if (splitter->_Channels[i]._CmdBuffer.Size == 0)
         {
-            ImDrawCmd draw_cmd;
-            draw_cmd.ClipRect = draw_list->_ClipRectStack.back();
-            draw_cmd.TextureId = draw_list->_TextureIdStack.back();
-            splitter->_Channels[i]._CmdBuffer.push_back(draw_cmd);
+            draw_list->AddDrawCmd();
+            splitter->_Channels[i]._CmdBuffer.push_back(draw_list->CmdBuffer.back());
+            draw_list->CmdBuffer.pop_back();
+
+            // ImDrawCmd draw_cmd;
+            // draw_cmd.ClipRect = draw_list->_ClipRectStack.back();
+            // draw_cmd.TextureId = draw_list->_TextureIdStack.back();
+            // splitter->_Channels[i]._CmdBuffer.push_back(draw_cmd);
         }
     }
 }
@@ -470,7 +474,8 @@ static void ImDrawList_AddBezierWithArrows(ImDrawList* drawList, const ImCubicBe
 
     if (fill)
     {
-        drawList->AddBezierCurve(curve.P0, curve.P1, curve.P2, curve.P3, color, thickness);
+        // drawList->AddBezierCurve(curve.P0, curve.P1, curve.P2, curve.P3, color, thickness);
+        drawList->AddBezierCubic(curve.P0, curve.P1, curve.P2, curve.P3, color, thickness);
 
         if (startArrowSize > 0.0f)
         {
@@ -1094,7 +1099,8 @@ void ed::EditorContext::Begin(const char* id, const ImVec2& size)
     //    ImGuiWindowFlags_NoScrollbar |
     //    ImGuiWindowFlags_NoScrollWithMouse);
 
-    ImGui::CaptureKeyboardFromApp();
+    // ImGui::CaptureKeyboardFromApp();
+    ImGui::SetNextFrameWantCaptureKeyboard(true);
 
     m_IsWindowActive = ImGui::IsWindowFocused();
 
@@ -1498,8 +1504,6 @@ void ed::EditorContext::SetNodePosition(NodeId nodeId, const ImVec2& position)
     }
 }
 
-<<<<<<< HEAD:NodeEditor/Source/imgui_node_editor.cpp
-=======
 void ed::EditorContext::SetGroupSize(NodeId nodeId, const ImVec2& size)
 {
     auto node = FindNode(nodeId);
@@ -1520,7 +1524,6 @@ void ed::EditorContext::SetGroupSize(NodeId nodeId, const ImVec2& size)
     }
 }
 
->>>>>>> 4487d47 (fixing for modern imgui):imgui_node_editor.cpp
 ImVec2 ed::EditorContext::GetNodePosition(NodeId nodeId)
 {
     auto node = FindNode(nodeId);
@@ -1745,14 +1748,14 @@ ed::Node* ed::EditorContext::CreateNode(NodeId id)
 
     node->m_Bounds.Min  = settings->m_Location;
     node->m_Bounds.Max  = node->m_Bounds.Min;
-    node->m_Bounds.Floor();
+    FloorRect(node->m_Bounds);
 
     if (settings->m_GroupSize.x > 0 || settings->m_GroupSize.y > 0)
     {
         node->m_Type            = NodeType::Group;
         node->m_GroupBounds.Min = settings->m_Location;
         node->m_GroupBounds.Max = node->m_GroupBounds.Min + settings->m_GroupSize;
-        node->m_GroupBounds.Floor();
+        FloorRect(node->m_GroupBounds);
     }
 
     node->m_IsLive = false;
@@ -2887,7 +2890,7 @@ ed::EditorAction::AcceptResult ed::NavigateAction::Accept(const Control& control
 
     auto& io = ImGui::GetIO();
 
-    if (ImGui::IsWindowFocused() && ImGui::IsKeyPressed(GetKeyIndexForF()) && Editor->AreShortcutsEnabled())
+    if (ImGui::IsWindowFocused() && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F)) && Editor->AreShortcutsEnabled())
     {
         const auto allowZoomIn = io.KeyShift;
 
@@ -3887,7 +3890,7 @@ ed::EditorAction::AcceptResult ed::ShortcutAction::Accept(const Control& control
         candidateAction = Copy;
     if (io.KeyCtrl && !io.KeyShift && !io.KeyAlt && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_V)))
         candidateAction = Paste;
-    if (io.KeyCtrl && !io.KeyShift && !io.KeyAlt && ImGui::IsKeyPressed(GetKeyIndexForD()))
+    if (io.KeyCtrl && !io.KeyShift && !io.KeyAlt && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_D)));//GetKeyIndexForD()))
         candidateAction = Duplicate;
     if (!io.KeyCtrl && !io.KeyShift && !io.KeyAlt && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Space)))
         candidateAction = CreateNode;

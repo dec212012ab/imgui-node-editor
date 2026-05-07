@@ -14,6 +14,7 @@
 
 //------------------------------------------------------------------------------
 # include <imgui.h>
+#include <imgui_internal.h>
 # include <cstdint> // std::uintXX_t
 # include <utility> // std::move
 
@@ -182,7 +183,7 @@ struct Style
         PivotAlignment          = ImVec2(0.5f, 0.5f);
         PivotSize               = ImVec2(-1, -1);
         PivotScale              = ImVec2(1, 1);
-        PinCorners              = ImDrawCornerFlags_All;
+        PinCorners              = ImDrawFlags_RoundCornersAll; //ImDrawCornerFlags_All;
         PinRadius               = 0.0f;
         PinArrowSize            = 0.0f;
         PinArrowWidth           = 0.0f;
