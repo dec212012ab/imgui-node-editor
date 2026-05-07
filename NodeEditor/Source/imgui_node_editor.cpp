@@ -1046,7 +1046,9 @@ ed::EditorContext::EditorContext(const ax::NodeEditor::Config* config)
     , m_DeleteItemsAction(this)
     , m_AnimationControllers{ &m_FlowAnimationController }
     , m_FlowAnimationController(this)
+    , m_HoveredNode(0)
     , m_DoubleClickedNode(0)
+    , m_HoveredPin(0)
     , m_DoubleClickedPin(0)
     , m_DoubleClickedLink(0)
     , m_BackgroundClicked(false)
@@ -1141,7 +1143,9 @@ void ed::EditorContext::End()
     auto  drawList    = ImGui::GetWindowDrawList();
     //auto& editorStyle = GetStyle();
 
+    m_HoveredNode             = control.HotNode           ? control.HotNode->m_ID : 0;
     m_DoubleClickedNode       = control.DoubleClickedNode ? control.DoubleClickedNode->m_ID : 0;
+    m_HoveredPin              = control.HotPin            ? control.HotPin->m_ID : 0;
     m_DoubleClickedPin        = control.DoubleClickedPin  ? control.DoubleClickedPin->m_ID  : 0;
     m_DoubleClickedLink       = control.DoubleClickedLink ? control.DoubleClickedLink->m_ID : 0;
     m_BackgroundClicked       = control.BackgroundClicked;

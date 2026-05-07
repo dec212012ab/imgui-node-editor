@@ -329,7 +329,9 @@ void EndShortcut();
 
 float GetCurrentZoom();
 
+NodeId GetHoveredNode();
 NodeId GetDoubleClickedNode();
+PinId GetHoveredPin();
 PinId GetDoubleClickedPin();
 LinkId GetDoubleClickedLink();
 bool IsBackgroundClicked();

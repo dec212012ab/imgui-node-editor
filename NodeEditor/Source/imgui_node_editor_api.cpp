@@ -591,9 +591,19 @@ float ax::NodeEditor::GetCurrentZoom()
     return s_Editor->GetView().InvScale;
 }
 
+ax::NodeEditor::NodeId ax::NodeEditor::GetHoveredNode()
+{
+    return s_Editor->GetHoveredNode();
+}
+
 ax::NodeEditor::NodeId ax::NodeEditor::GetDoubleClickedNode()
 {
     return s_Editor->GetDoubleClickedNode();
+}
+
+ax::NodeEditor::PinId ax::NodeEditor::GetHoveredPin()
+{
+    return s_Editor->GetHoveredPin();
 }
 
 ax::NodeEditor::PinId ax::NodeEditor::GetDoubleClickedPin()
